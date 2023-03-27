@@ -44,14 +44,14 @@ args = parser.parse_args()
 # 2. PART: importing data
 ##
 #table with population:
-population = pd.read_csv("population.csv", skiprows=4)
+population = pd.read_csv(args.population_file, skiprows=4)
 population = population.drop("Unnamed: 66", axis=1)
 
 #table with co2 emissions:
-co2_emissions = pd.read_csv("co2-fossil-by-nation_zip/data/fossil-fuel-co2-emissions-by-nation_csv.csv", skiprows=0)
+co2_emissions = pd.read_csv(args.co2_emission_file, skiprows=0)
 
 #table with gdp
-gdp = pd.read_csv("gdp.csv", skiprows=4)
+gdp = pd.read_csv(args.gdp_file, skiprows=4)
 gdp = gdp.drop("Unnamed: 66", axis=1)
 
 
@@ -59,11 +59,11 @@ gdp = gdp.drop("Unnamed: 66", axis=1)
 # 3. PART
 ###
 if args.gdponperson:
-	print("Table with gdp on person. \n 5 countries for each year with greatest values")
+	print("TASK1: Table with gdp on person. \n5 countries for each year with greatest values")
 	start_year = args.startyear
 	end_year = args.endyear
 
-	for i in range(start_year,end_year):
+	for i in range(start_year,end_year + 1):
 	    y = str(i)
 	    cnl = population["Country Name"].to_numpy()
 	    pl = population[y].to_numpy()
@@ -73,7 +73,7 @@ if args.gdponperson:
 	    print(tab)
 	
 else:
-	print("Table with co2_emission on person. \n 5 countries for each year with greatest values \n Loading...")
-	tab2 = task2.co2_emissions_per_person(population, co2_emissions)
+	print("TASK2: Table with co2_emission on person. \n5 countries for each year with greatest values \nLoading...")
+	tab2 = task2.co2_emissions_per_person(population, co2_emissions, args.startyear, args.endyear)
 	ans = tab2.groupby(level='Year')['Total'].nlargest(5)
 	print(ans)

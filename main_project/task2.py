@@ -17,7 +17,7 @@ def is_equel(s1, s2):
         return 2
     return 0
     
-def co2_emissions_per_person(population, co2_emissions):
+def co2_emissions_per_person(population, co2_emissions, start_year, end_year):
 	#1. setting indexes
 	co2_emissions = co2_emissions.set_index(['Year', 'Country'])
 	population = population.set_index('Country Name')
@@ -26,13 +26,16 @@ def co2_emissions_per_person(population, co2_emissions):
 	population_top = population.columns
 	indexes_pop = np.array(population_top)
 	indexes_pop = np.delete(indexes_pop, [0,1,2]).astype(int)
+	
+	#2a. selecting dates since start_year to end_year
+	indexes_pop = indexes_pop[(start_year <= indexes_pop) & (indexes_pop <= end_year)]
 
-	##usuwanie kraju
+	##3. country deleting
 	indexes_co2 = np.array(co2_emissions.index)
 	indexes_co2 = np.array([i[0] for i in indexes_co2])
 	indexes_co2 = np.unique(indexes_co2)
 
-	###nowa lista z elementami z indexes_co2 \ indexes_pop
+	###new list with elements from indexes_co2 \ indexes_pop
 	to_deleting = np.setdiff1d(indexes_co2, indexes_pop)
 	co2_emissions2 = co2_emissions.drop(to_deleting, axis=0) #indeksy które są i w countries i w co2_emissions
 	
@@ -50,7 +53,11 @@ def co2_emissions_per_person(population, co2_emissions):
 	
 	#countries which are in s (co2.emmisions) but not in ss.population
 	zle = np.setdiff1d(s, ss, assume_unique=True)
-
+	
+	if len(zle) > 0:
+		print("WARNING: There are some types in country names or not every country from co2_emmision table occurs in population table.")
+		print("The program is trying to connect countries from both tables, but it may not be able to recognize everything.")
+	
 	#countries to deleting from co2_emmisions, for witch we can't find a proper country's name in population
 	num = 0
 	for zle_var in zle:
